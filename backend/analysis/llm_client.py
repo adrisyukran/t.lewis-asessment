@@ -64,7 +64,7 @@ class NanoGPTClient:
             rag_context: The retrieved brand guideline context to ground the analysis.
 
         Returns:
-            An AnalysisResult dataclass containing the red flag, opportunity, and summary.
+            An AnalysisResult dataclass containing the comparison, red flag, opportunity, and summary.
         """
         campaign_metrics_str = str(metrics)
         user_prompt = ANALYSIS_USER_TEMPLATE.format(
@@ -86,6 +86,7 @@ class NanoGPTClient:
         parsed = json.loads(cleaned)
 
         return AnalysisResult(
+            comparison=parsed["comparison"],
             red_flag=parsed["red_flag"],
             opportunity=parsed["opportunity"],
             summary=parsed["summary"],
