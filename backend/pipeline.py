@@ -1,5 +1,7 @@
 """Pipeline orchestrator that wires together all backend phases."""
 
+import re
+
 from backend.analysis.llm_client import NanoGPTClient
 from backend.extraction.cleanup import cleanup_ocr_text
 from backend.extraction.ocr import extract_text_from_file
@@ -19,6 +21,53 @@ class Orchestrator:
         """
         self.llm_client = llm_client or NanoGPTClient()
 
+    @staticmethod
+    def extract_targets_from_guidelines(guidelines_text: str) -> dict:
+        """Extract target metric values from brand guidelines text.
+
+        Uses regex to find common target patterns such as
+        "target ROAS is 4.0" or "CTR > 1.5%".
+
+        Args:
+            guidelines_text: The raw text of the brand guidelines.
+
+        Returns:
+            A dictionary mapping normalized metric names to their target
+            values as floats (percentages are converted to decimals).
+        """
+        targets: dict[str, float] = {}
+
+        # Pattern: "target <metric> is <value>" or "<metric> is <value>"
+        # Also catches "target overall ROAS is 4.0"
+        target_patterns = [
+            (r"target\s+(?:overall\s+)?ROAS\s+is\s+(\d+\.?\d*)", "roas"),
+            (r"minimum\s+acceptable\s+(?:Return\s+on\s+Ad\s+Spend\s+\(ROAS\)\s+)?(?:ROAS\s+)?is\s+(\d+\.?\d*)", "min_roas"),
+            (r"ROAS\s+for\s+.*?(?:is|should\s+be)\s+(\d+\.?\d*)", "roas"),
+            (r"achieve\s+(?:at\s+least\s+)?(\d+\.?\d*)[x×]", "roas"),
+            (r"CTR\s+(?:is\s+)?[>\s]+(\d+\.?\d*)%?", "ctr"),
+            (r"target\s+blended\s+CTR\s+is\s+(\d+\.?\d*)%?", "ctr"),
+            (r"CTR\s+must\s+remain\s+above\s+(\d+\.?\d*)%?", "ctr"),
+            (r"above\s+(\d+\.?\d*)%\s+for\s+display", "ctr"),
+            (r"above\s+(\d+\.?\d*)%\s+for\s+search", "ctr"),
+            (r"CPA\s+should\s+not\s+exceed\s+\$(\d+)", "cpa"),
+        ]
+
+        for pattern, key in target_patterns:
+            for match in re.finditer(pattern, guidelines_text, re.IGNORECASE):
+                value_str = match.group(1)
+                try:
+                    value = float(value_str)
+                    # If the pattern explicitly includes a % sign or the key is CTR,
+                    # store as decimal (e.g., 2.0% -> 0.02) only when the raw value
+                    # looks like a percentage (> 1 usually implies percent points).
+                    if key == "ctr" and value > 1:
+                        value = value / 100.0
+                    targets[key] = value
+                except ValueError:
+                    continue
+
+        return targets
+
     def run_pipeline(self, report_path: str, guidelines_path: str) -> dict:
         """Execute the full analysis pipeline.
 
@@ -36,6 +85,7 @@ class Orchestrator:
         Returns:
             A dictionary containing:
                 - "metrics": The parsed CampaignMetrics as a dict.
+                - "targets": Extracted target values from the guidelines.
                 - "context": The retrieved RAG context string.
                 - "analysis": The final AnalysisResult as a dict.
         """
@@ -55,6 +105,11 @@ class Orchestrator:
         # Phase 5: LLM analysis
         analysis_result = self.llm_client.analyze_campaign(metrics, context_string)
 
+        # Extract targets from the raw guidelines text
+        with open(guidelines_path, "r", encoding="utf-8") as f:
+            guidelines_text = f.read()
+        targets = self.extract_targets_from_guidelines(guidelines_text)
+
         return {
             "metrics": {
                 "spend": metrics.spend,
@@ -62,6 +117,7 @@ class Orchestrator:
                 "ctr": metrics.ctr,
                 "impressions": metrics.impressions,
             },
+            "targets": targets,
             "context": context_chunks,
             "analysis": {
                 "red_flag": analysis_result.red_flag,
