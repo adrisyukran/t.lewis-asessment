@@ -86,8 +86,8 @@ class NanoGPTClient:
         parsed = json.loads(cleaned)
 
         return AnalysisResult(
-            comparison=parsed["comparison"],
-            red_flag=parsed["red_flag"],
-            opportunity=parsed["opportunity"],
-            summary=parsed["summary"],
+            comparison=parsed.get("comparison", "No comparison data available."),
+            red_flag=parsed.get("red_flag", "No red flags identified."),
+            opportunity=parsed.get("opportunity", "No opportunities identified."),
+            summary=parsed.get("summary", "No summary available."),
         )
