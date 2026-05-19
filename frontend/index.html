@@ -106,18 +106,22 @@
                         <div class="metric-item">
                             <span class="metric-label">Spend</span>
                             <span class="metric-value" id="metricSpend">--</span>
+                            <span class="metric-target" id="targetSpend"></span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">ROAS</span>
                             <span class="metric-value" id="metricRoas">--</span>
+                            <span class="metric-target" id="targetRoas"></span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">CTR</span>
                             <span class="metric-value" id="metricCtr">--</span>
+                            <span class="metric-target" id="targetCtr"></span>
                         </div>
                         <div class="metric-item">
                             <span class="metric-label">Impressions</span>
                             <span class="metric-value" id="metricImpressions">--</span>
+                            <span class="metric-target" id="targetImpressions"></span>
                         </div>
                     </div>
                 </div>
@@ -132,7 +136,10 @@
 
                 <!-- Relevant Guidelines -->
                 <div class="results-card guidelines-card">
-                    <h3 class="card-title">Relevant Guidelines</h3>
+                    <div class="card-header-with-subtitle">
+                        <h3 class="card-title">Relevant Guidelines</h3>
+                        <span class="card-subtitle">Top 4 retrieved by similarity from brand_guidelines.txt</span>
+                    </div>
                     <div class="guidelines-list" id="guidelinesList">
                         <!-- Guidelines will be populated here -->
                     </div>
