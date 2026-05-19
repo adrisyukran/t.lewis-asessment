@@ -1,0 +1,10 @@
+pytesseract
+pdf2image
+PyPDF2
+flask
+pillow
+sentence-transformers
+numpy
+openai
+python-dotenv
+reportlab
