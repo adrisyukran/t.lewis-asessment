@@ -25,6 +25,7 @@ const elements = {
     metricRoas: null,
     metricCtr: null,
     metricImpressions: null,
+    comparisonText: null,
     guidelinesList: null,
     redFlagText: null,
     opportunityText: null,
@@ -53,6 +54,7 @@ function initializeElements() {
     elements.metricRoas = document.getElementById('metricRoas');
     elements.metricCtr = document.getElementById('metricCtr');
     elements.metricImpressions = document.getElementById('metricImpressions');
+    elements.comparisonText = document.getElementById('comparisonText');
     elements.guidelinesList = document.getElementById('guidelinesList');
     elements.redFlagText = document.getElementById('redFlagText');
     elements.opportunityText = document.getElementById('opportunityText');
@@ -114,19 +116,58 @@ function formatPercentage(value) {
     return Number(value).toFixed(2) + '%';
 }
 
+// Loading status messages for dynamic feedback
+const LOADING_MESSAGES = [
+    'Extracting text from report...',
+    'Cleaning OCR errors...',
+    'Retrieving brand guidelines...',
+    'Performing agentic analysis...',
+    'Finalizing recommendations...'
+];
+
+// Interval reference for clearing
+let loadingInterval = null;
+let currentMessageIndex = 0;
+
 /**
- * Show loading overlay
+ * Update loading text with dynamic status
  */
-function showLoading() {
-    isLoading = true;
-    elements.loadingOverlay.classList.add('active');
-    elements.analyzeButton.disabled = true;
+function updateLoadingStatus() {
+    const loadingText = elements.loadingOverlay.querySelector('.loading-text');
+    if (loadingText) {
+        loadingText.textContent = LOADING_MESSAGES[currentMessageIndex];
+        currentMessageIndex = (currentMessageIndex + 1) % LOADING_MESSAGES.length;
+    }
 }
 
 /**
- * Hide loading overlay
+ * Show loading overlay with dynamic status updates
+ */
+function showLoading() {
+    isLoading = true;
+    currentMessageIndex = 0;
+    elements.loadingOverlay.classList.add('active');
+    elements.analyzeButton.disabled = true;
+    
+    // Set initial message immediately
+    const loadingText = elements.loadingOverlay.querySelector('.loading-text');
+    if (loadingText) {
+        loadingText.textContent = LOADING_MESSAGES[0];
+    }
+    
+    // Start cycling through messages every 2.5 seconds
+    loadingInterval = setInterval(updateLoadingStatus, 2500);
+}
+
+/**
+ * Hide loading overlay and stop status updates
  */
 function hideLoading() {
+    // Clear the interval when loading completes
+    if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
+    }
     isLoading = false;
     elements.loadingOverlay.classList.remove('active');
     elements.analyzeButton.disabled = false;
@@ -197,6 +238,14 @@ function populateMetrics(metrics) {
     elements.metricRoas.textContent = metrics.roas !== undefined ? metrics.roas.toFixed(2) + 'x' : '--';
     elements.metricCtr.textContent = formatPercentage(metrics.ctr);
     elements.metricImpressions.textContent = formatNumber(metrics.impressions, 0);
+}
+
+/**
+ * Populate comparison section in the UI
+ * @param {string} comparison - Comparison text from API response
+ */
+function populateComparison(comparison) {
+    elements.comparisonText.textContent = comparison || 'No comparison data available';
 }
 
 /**
@@ -323,6 +372,7 @@ async function handleFormSubmit(event) {
         
         // Populate results
         populateMetrics(result.metrics);
+        populateComparison(result.analysis?.comparison);
         populateGuidelines(result.context);
         populateAnalysis(result.analysis);
         populateSummary(result.analysis?.summary);
