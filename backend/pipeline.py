@@ -120,6 +120,7 @@ class Orchestrator:
             "targets": targets,
             "context": context_chunks,
             "analysis": {
+                "comparison": analysis_result.comparison,
                 "red_flag": analysis_result.red_flag,
                 "opportunity": analysis_result.opportunity,
                 "summary": analysis_result.summary,
