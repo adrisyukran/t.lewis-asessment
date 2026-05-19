@@ -13,12 +13,13 @@ Campaign Metrics:
 {campaign_metrics}
 
 Instructions:
-1. Compare the actual campaign metrics against the brand's goals found in the context above.
-2. Classify each metric as above target, on track, or below target.
-3. Identify exactly ONE red flag in performance.
-4. Identify exactly ONE opportunity to improve or scale.
-5. Write a concise 3-sentence summary for a Client Lead in a bold but professional tone.
+1. Compare the actual campaign metrics against the specific brand goals and targets found in the provided guidelines.
+2. For each metric, state whether it is Above, On Track, or Below the target.
+3. Provide this comparison as a concise, structured analysis.
+4. Identify exactly ONE red flag in performance.
+5. Identify exactly ONE opportunity to improve or scale.
+6. Write a concise 3-sentence summary for a Client Lead in a bold but professional tone.
 
-Crucial: Respond ONLY in valid JSON format with exactly these keys: "red_flag", "opportunity", "summary".
+Crucial: Respond ONLY in valid JSON format with exactly these keys: "comparison", "red_flag", "opportunity", "summary".
 Do not include markdown formatting, explanations, or any text outside the JSON object.
 """
