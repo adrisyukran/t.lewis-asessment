@@ -1,0 +1,81 @@
+Aurora Activewear – Brand Guidelines (v1.0)
+
+1. Brand Essence
+- Aurora Activewear exists to help ambitious professionals feel confident, energized, and ready to move.
+- Our positioning: premium, performance-focused athleisure with an approachable price point.
+- Core values: performance, confidence, inclusivity, and sustainability.
+
+2. Brand Voice and Tone
+- Our brand voice is bold, energetic, and professional.
+- We speak with confidence backed by data, never with hype or exaggeration.
+- We avoid slang that will age quickly; we prefer clear, modern language.
+- Tone guidelines:
+  - Launch and promotional campaigns: upbeat, aspirational, slightly playful.
+  - Performance or quarterly reports: direct, analytical, and recommendation-driven.
+  - Customer-facing summaries: encouraging, solutions-focused, never blaming.
+
+3. Target Audience
+- Primary audience: urban professionals aged 25–40 who work in hybrid or office roles.
+- Audience attributes:
+  - Time-poor but health-conscious.
+  - Comfortable buying premium products online.
+  - Heavy users of Instagram and YouTube; moderate users of Facebook; low engagement on LinkedIn.
+- We prioritize creatives and placements that feature:
+  - Realistic body types.
+  - Active lifestyle scenes (commuting, post-work gym, weekend activities).
+  - Clear product benefits (comfort, fit, performance fabric).
+
+4. Performance and Media Goals
+- Our target overall ROAS is 4.0 across paid media.
+- Minimum acceptable ROAS is 3.2 for experimental campaigns and 3.5 for always-on campaigns.
+- Our target blended CTR is 2.0% or higher for prospecting campaigns and 2.5% or higher for retargeting.
+- We prioritize quality of traffic over raw volume; it is acceptable to reduce impressions if ROAS and CTR improve.
+- We are comfortable increasing spend by 20–30% week-over-week when:
+  - ROAS is 4.0 or higher AND
+  - CTR is 2.0% or higher AND
+  - Conversion volume is stable or increasing.
+
+5. Channel Priorities
+- We prioritize Instagram over LinkedIn for both paid and organic activity.
+- Channel hierarchy for paid campaigns:
+  1) Instagram (Feed, Reels, Stories)
+  2) Facebook (Feed, Stories)
+  3) Google Search (brand + high-intent non-brand)
+  4) TikTok (test budgets only)
+  5) LinkedIn (not a focus unless explicitly requested by B2B partners)
+- When performance is strong on Instagram and Facebook but weak on LinkedIn:
+  - Reallocate budget away from LinkedIn.
+  - Do not force LinkedIn spend just for coverage.
+
+6. Creative and Messaging Guidelines
+- Mandatory elements in performance ads:
+  - Clear product hero image or video in the first 2 seconds.
+  - Simple benefit-led headline (e.g., “All-day comfort that moves with you”).
+  - “Shop now” or equivalent call-to-action.
+- Avoid:
+  - Overly crowded layouts.
+  - Long paragraphs of copy in images.
+  - Stock photography that does not reflect our real customer base.
+- Copy tone:
+  - Bold but honest claims (e.g., “Thousands of reviewers rate Aurora 4.8/5” only if true).
+  - Focus on how the product fits into the customer’s day rather than abstract lifestyle slogans.
+
+7. Measurement and Reporting Standards
+- Standard KPIs for campaign reports:
+  - Spend, Impressions, Clicks, CTR, Conversions, Revenue, ROAS, CPC, CPM.
+- We expect all quarterly reports to clearly highlight:
+  - Top 3 performing channels by ROAS.
+  - Underperforming channels relative to our target ROAS of 4.0.
+  - At least one clear red flag and one clear opportunity.
+- We prefer recommendations that:
+  - Are specific (“Shift 15% of budget from LinkedIn to Instagram Reels”) rather than generic.
+  - Are grounded in both numbers and brand context (voice, audience, and channel priorities).
+
+8. Risk Tolerance and Guardrails
+- We tolerate short-term ROAS dips during controlled tests on new channels or creatives, as long as:
+  - Test budgets are capped at 20% of total spend.
+  - There is a clear hypothesis and success metric.
+- We do NOT accept sustained ROAS below 3.0 on always-on campaigns without a remediation plan.
+- We will pause any audience or channel that consistently underperforms for 4 consecutive weeks.
+
+End of Aurora Activewear Brand Guidelines.
