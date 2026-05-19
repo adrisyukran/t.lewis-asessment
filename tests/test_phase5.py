@@ -32,6 +32,12 @@ def test_analyze_campaign() -> None:
 
     # Expected JSON response from the LLM.
     expected_json = {
+        "comparison": (
+            "ROAS: Below target (3.8 vs 4.0 goal). "
+            "CTR: Below target (1.05% vs 1.5% goal). "
+            "Spend: Above target ($1,250 vs $1,000 goal). "
+            "Impressions: Below target (45,000 vs 50,000 goal)."
+        ),
         "red_flag": "ROAS is below the 4.0 target at 3.8.",
         "opportunity": "Increase CTR by refining ad creative to reach the 1.5% benchmark.",
         "summary": (
@@ -60,6 +66,7 @@ def test_analyze_campaign() -> None:
     print("=" * 60)
     print("AnalysisResult Output")
     print("=" * 60)
+    print(f"comparison : {result.comparison}")
     print(f"red_flag   : {result.red_flag}")
     print(f"opportunity: {result.opportunity}")
     print(f"summary    : {result.summary}")
@@ -67,11 +74,13 @@ def test_analyze_campaign() -> None:
 
     # Validate type and fields.
     assert isinstance(result, AnalysisResult), "Result must be an AnalysisResult instance"
+    assert hasattr(result, "comparison") and isinstance(result.comparison, str)
     assert hasattr(result, "red_flag") and isinstance(result.red_flag, str)
     assert hasattr(result, "opportunity") and isinstance(result.opportunity, str)
     assert hasattr(result, "summary") and isinstance(result.summary, str)
 
     # Validate content matches the mocked LLM output.
+    assert result.comparison == expected_json["comparison"]
     assert result.red_flag == expected_json["red_flag"]
     assert result.opportunity == expected_json["opportunity"]
     assert result.summary == expected_json["summary"]
