@@ -443,6 +443,27 @@ body {
     border-bottom: 1px solid var(--color-gray-200);
 }
 
+/* Card Header with Subtitle */
+.card-header-with-subtitle {
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.card-header-with-subtitle .card-title {
+    margin-bottom: var(--spacing-1);
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.card-subtitle {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-400);
+    font-weight: 400;
+    font-style: italic;
+}
+
 /* Metrics Grid */
 .metrics-grid {
     display: grid;
@@ -477,6 +498,14 @@ body {
     font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--color-primary-700);
+}
+
+.metric-target {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-400);
+    margin-top: var(--spacing-1);
+    font-weight: 500;
 }
 
 /* Comparison Card */
@@ -557,6 +586,42 @@ body {
 .guideline-index::before {
     content: '📄';
     font-size: var(--font-size-sm);
+}
+
+/* Guideline Header with Badge */
+.guideline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-2);
+}
+
+.guideline-rag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--color-gray-500);
+    background: var(--color-gray-100);
+    padding: 2px var(--spacing-2);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gray-200);
+    cursor: help;
+    transition: all var(--transition-fast);
+}
+
+.guideline-rag-badge:hover {
+    background: var(--color-primary-50);
+    color: var(--color-primary-600);
+    border-color: var(--color-primary-200);
+}
+
+.guideline-rag-badge::before {
+    content: '⚡';
+    font-size: 0.7rem;
 }
 
 /* Analysis Grid - Strategic Analysis Cards */
