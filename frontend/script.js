@@ -222,22 +222,72 @@ function handleFileSelect(input, display) {
 }
 
 /**
- * Populate metrics in the UI
+ * Populate metrics in the UI with actual values and targets
  * @param {Object} metrics - Metrics object from API response
+ * @param {Object} targets - Targets object from API response
  */
-function populateMetrics(metrics) {
+function populateMetrics(metrics, targets) {
     if (!metrics) {
         elements.metricSpend.textContent = '--';
         elements.metricRoas.textContent = '--';
         elements.metricCtr.textContent = '--';
         elements.metricImpressions.textContent = '--';
+        clearTargets();
         return;
     }
     
+    // Format and display actual values
     elements.metricSpend.textContent = formatCurrency(metrics.spend);
     elements.metricRoas.textContent = metrics.roas !== undefined ? metrics.roas.toFixed(2) + 'x' : '--';
     elements.metricCtr.textContent = formatPercentage(metrics.ctr);
     elements.metricImpressions.textContent = formatNumber(metrics.impressions, 0);
+    
+    // Display targets where available
+    updateTargetDisplay('targetSpend', null, 'spend'); // No target for spend
+    updateTargetDisplay('targetRoas', targets?.roas, 'roas');
+    updateTargetDisplay('targetCtr', targets?.ctr, 'ctr');
+    updateTargetDisplay('targetImpressions', null, 'impressions'); // No target for impressions
+}
+
+/**
+ * Clear all target displays
+ */
+function clearTargets() {
+    const targetIds = ['targetSpend', 'targetRoas', 'targetCtr', 'targetImpressions'];
+    targetIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = '';
+    });
+}
+
+/**
+ * Update target display for a metric
+ * @param {string} elementId - The DOM element ID for the target
+ * @param {*} targetValue - The target value (may be undefined)
+ * @param {string} metricType - The type of metric (roas, ctr, etc.)
+ */
+function updateTargetDisplay(elementId, targetValue, metricType) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    if (targetValue === undefined || targetValue === null) {
+        element.textContent = '';
+        return;
+    }
+    
+    let formattedTarget;
+    switch (metricType) {
+        case 'roas':
+            formattedTarget = targetValue.toFixed(1) + 'x';
+            break;
+        case 'ctr':
+            formattedTarget = (targetValue * 100).toFixed(2) + '%';
+            break;
+        default:
+            formattedTarget = targetValue;
+    }
+    
+    element.textContent = `Target: ${formattedTarget}`;
 }
 
 /**
@@ -272,7 +322,10 @@ function populateGuidelines(context) {
         const item = document.createElement('div');
         item.className = 'guideline-item';
         item.innerHTML = `
-            <span class="guideline-index">Chunk ${index + 1}</span>
+            <div class="guideline-header">
+                <span class="guideline-index">Chunk ${index + 1}</span>
+                <span class="guideline-rag-badge" title="This content was retrieved using cosine similarity search from the brand guidelines file">Retrieved via Cosine Similarity</span>
+            </div>
             <p class="guideline-text">${escapeHtml(chunk)}</p>
         `;
         elements.guidelinesList.appendChild(item);
@@ -371,7 +424,7 @@ async function handleFormSubmit(event) {
         const result = await analyzeCampaign(formData);
         
         // Populate results
-        populateMetrics(result.metrics);
+        populateMetrics(result.metrics, result.targets);
         populateComparison(result.analysis?.comparison);
         populateGuidelines(result.context);
         populateAnalysis(result.analysis);
