@@ -1,74 +1,70 @@
 # Campaign Analyzer PoC
 
-A lightweight, end-to-end proof-of-concept application that analyzes campaign reports against brand guidelines using **OCR**, **RAG (Retrieval-Augmented Generation)**, and **LLM-powered agentic reasoning**.
+**Goal**: Automate the analysis of marketing campaign reports by extracting performance metrics from PDFs/images, retrieving relevant brand guidelines, and generating actionable insights using LLMs.
 
-## Project Overview
+### The Problem It Solves
 
-The Campaign Analyzer allows users to upload a campaign report (PDF or image) and a brand guidelines text file. The system then:
+Marketing teams receive campaign reports in PDF or image formats that are time-consuming to manually review. Brand guidelines exist but are rarely consulted during quick assessments. This PoC demonstrates an automated pipeline that combines OCR, retrieval-augmented generation, and LLM reasoning to provide consistent, data-driven campaign analysis in seconds.
 
-1. **Extracts** text from the report using OCR (Tesseract) and PDF parsing.
-2. **Chunks & embeds** the brand guidelines using `sentence-transformers` for semantic retrieval.
-3. **Retrieves** relevant guideline sections based on the report content.
-4. **Analyzes** the campaign report using an LLM (NanoGPT API) with the retrieved guidelines as context.
-5. **Presents** the analysis results in a clean, interactive web UI.
+---
 
-## Prerequisites
+## The Pipeline
 
-Before running the project, ensure you have the following installed:
+### Phase 1: OCR & Extraction
 
-- **Python 3.8+**
-- **Tesseract OCR**
-  - Download and install from: https://github.com/UB-Mannheim/tesseract/wiki
-  - Make sure `tesseract` is added to your system PATH.
-- **Poppler (for pdf2image)**
-  - Download from: https://github.com/oschwartz10612/poppler-windows/releases
-  - Extract and add the `bin/` folder to your system PATH.
+The extraction pipeline uses a **hybrid approach** to handle both digitally-created PDFs and scanned documents or images.
 
-## Setup Instructions
+- **For PDFs**: The pipeline first attempts direct text extraction using [`PyPDF2`](backend/extraction/ocr.py:12). If the extracted text is empty or very short (< 50 characters), it falls back to **OCR on the first page** using [`pdf2image`](backend/extraction/ocr.py:12) + [`pytesseract`](backend/extraction/ocr.py:12) (Tesseract).
+- **For Images**: PNG, JPG, and JPEG files are processed directly with [`pytesseract.image_to_string()`](backend/extraction/ocr.py:12).
 
-1. **Clone or extract the project** to your local machine.
+This ensures that both selectable-text PDFs and image-based reports are handled without relying on cloud vision APIs.
 
-2. **Configure environment variables:**
-   - Copy `.env.example` to `.env`:
-     ```bash
-     copy .env.example .env
-     ```
-   - Open `.env` and set your NanoGPT API key:
-     ```
-     NANOGPT_API_KEY=your_actual_api_key_here
-     ```
+**Extracted Metrics**: Spend, ROAS, CTR, Impressions.
 
-3. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-## How to Run
+### Phase 2: Contextual Logic (RAG)
 
-On **Windows**, simply double-click the provided batch script:
+The RAG pipeline grounds the LLM's analysis in the brand guidelines provided.
 
-```bash
-run.bat
-```
+1. **Chunking**: Guidelines are split into semantic chunks by paragraph (double newlines) via [`backend/rag/chunker.py`](backend/rag/chunker.py:4). This preserves context within each section while keeping chunks small enough for embedding.
+2. **Embedding**: All chunks are embedded using [`sentence-transformers/all-MiniLM-L6-v2`](backend/rag/embedder.py:20), a lightweight but high-quality model that produces 384-dimensional dense vectors. The model is loaded once and cached to avoid reloading on every call.
+3. **Indexing & Retrieval**: Instead of a persistent vector database, the system uses an **in-memory FAISS index** built via LangChain's `FAISS` class. The index is ephemeral—created at runtime for each request and discarded after. A synthetic query is built from the extracted metrics, and the top-4 most similar chunks are retrieved using cosine similarity in [`backend/rag/retriever.py`](backend/rag/retriever.py:8).
 
-This script will:
-- Verify Python is available.
-- Install any missing dependencies from `requirements.txt`.
-- Start the Flask backend in a new console window.
-- Open the frontend (`frontend/index.html`) in your default web browser.
+---
 
-### Manual Run (Alternative)
+### Phase 3: Agentic Reasoning
 
-If you prefer to run manually:
+The analysis pipeline uses the [`NanoGPTClient`](backend/analysis/llm_client.py:19) class to call an OpenAI-compatible endpoint (NanoGPT).
 
-```bash
-# Terminal 1: Start the backend
-python backend/app.py
+The prompt injects:
+1. The retrieved brand guideline context.
+2. The parsed campaign metrics.
 
-# Terminal 2: Serve the frontend (or simply open frontend/index.html in a browser)
-```
+The LLM is instructed to respond **only in JSON** with exactly four keys:
+- `comparison`: Metric-by-metric comparison against targets (Above / On Track / Below).
+- `red_flag`: Exactly ONE identified issue with specific numbers and channels.
+- `opportunity`: Exactly ONE improvement or scaling opportunity.
+- `summary`: A bold, professional 3-sentence summary for a Client Lead.
 
-The backend API will be available at `http://127.0.0.1:5000`.
+This is intentionally **not** a multi-step agent loop. The design is one prompt → one response → structured result, making it fast, deterministic, and easy to debug.
+
+---
+
+## Design Philosophy
+
+**Simple, not over-engineered.**
+
+This project deliberately avoids complex patterns. Every architectural decision prioritizes simplicity:
+
+- **No multi-step agent loops**: One prompt, one response; deterministic and fast.
+- **No persistent vector databases**: Guidelines are chunked, embedded, and indexed at runtime using in-memory FAISS. This avoids infrastructure overhead, cost, and vendor lock-in for a PoC scope.
+- **No cloud vision APIs**: The OCR stack (`PyPDF2`, `pdf2image`, `Tesseract`) is 100% local and open-source, eliminating per-page costs and network dependencies.
+- **Minimal dependencies**: Core functionality relies on well-maintained open-source libraries.
+
+The goal is a **proof-of-concept that demonstrates core competency**—the integration of OCR, RAG, and LLM reasoning—without over-engineering for production scale.
+
+---
 
 ## Project Structure
 
@@ -76,10 +72,10 @@ The backend API will be available at `http://127.0.0.1:5000`.
 .
 ├── backend/
 │   ├── app.py                  # Flask API entry point
-│   ├── pipeline.py             # Orchestrator that wires the pipeline together
+│   ├── pipeline.py             # Orchestrator
 │   ├── analysis/
 │   │   ├── llm_client.py       # NanoGPT API client
-│   │   ├── models.py           # Pydantic data models for analysis
+│   │   ├── models.py           # Pydantic data models
 │   │   └── prompt_templates.py # LLM prompt templates
 │   ├── extraction/
 │   │   ├── ocr.py              # OCR and PDF text extraction
@@ -97,7 +93,7 @@ The backend API will be available at `http://127.0.0.1:5000`.
 │   └── script.js               # Frontend logic
 ├── data/
 │   ├── brand_guidelines.txt    # Sample brand guidelines
-│   └── sample_report.pdf       # Sample campaign report
+│   └── aurora_q1_report.pdf    # Sample campaign report
 ├── tests/
 │   ├── test_phase2.py          # OCR / extraction tests
 │   ├── test_phase3.py          # Chunking / embedding tests
@@ -106,17 +102,10 @@ The backend API will be available at `http://127.0.0.1:5000`.
 │   └── test_phase6.py          # End-to-end pipeline tests
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Example environment configuration
-├── run.bat                     # Windows startup script
 └── README.md                   # This file
 ```
 
-## Technical Details
-
-- **OCR & Extraction**: Uses `pytesseract` + `pdf2image` / `PyPDF2` to extract text from images and PDFs.
-- **RAG**: Uses `sentence-transformers` (`all-MiniLM-L6-v2`) to embed brand guideline chunks and perform cosine-similarity retrieval.
-- **LLM**: Uses the **NanoGPT API** for agentic reasoning, generating campaign analysis based on the report and retrieved guideline context.
-- **Backend**: Flask with CORS enabled, exposing `/api/health` and `/api/analyze` endpoints.
-- **Frontend**: Vanilla HTML/CSS/JS with a responsive drag-and-drop file upload interface.
+---
 
 ## License
 
