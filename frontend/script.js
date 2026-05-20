@@ -4,7 +4,9 @@
  */
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000';
+// Use relative path so Nginx proxies /api to the backend container.
+// This works correctly both in Docker and behind Cloudflare Tunnels.
+const API_BASE_URL = '';
 const ANALYZE_ENDPOINT = '/api/analyze';
 
 // DOM Elements
