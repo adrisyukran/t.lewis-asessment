@@ -15,6 +15,9 @@ FROM nginx:alpine
 # Copy custom nginx configuration
 COPY --chown=nginx:nginx frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
+# Cache-bust argument to force rebuild on every build
+ARG CACHE_BUST=1
+
 # Copy static files
 COPY --chown=nginx:nginx frontend/ /usr/share/nginx/html/
 
