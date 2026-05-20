@@ -60,4 +60,7 @@ def analyze() -> tuple:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    HOST = os.environ.get("FLASK_HOST", "0.0.0.0")
+    PORT = int(os.environ.get("FLASK_PORT", "5000"))
+    DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+    app.run(host=HOST, port=PORT, debug=DEBUG)
