@@ -17,6 +17,39 @@ TEMP_DIR = Path(tempfile.gettempdir()) / "campaign_analysis"
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
+@app.before_request
+def log_request() -> None:
+    """Log every incoming request for debugging."""
+    import sys
+    print(f"[BACKEND LOG] {request.method} {request.path}", file=sys.stderr)
+    print(f"[BACKEND LOG] full_url={request.url}", file=sys.stderr)
+    print(f"[BACKEND LOG] x_debug_uri={request.headers.get('X-Debug-Uri', 'NOT_SET')}", file=sys.stderr)
+    sys.stderr.flush()
+
+
+@app.errorhandler(404)
+def handle_404(e) -> tuple:
+    """Log 404 errors with the requested path."""
+    import sys
+    print(f"[BACKEND LOG] 404 NOT FOUND: {request.method} {request.path}", file=sys.stderr)
+    print(f"[BACKEND LOG] 404 full_url={request.url}", file=sys.stderr)
+    print(f"[BACKEND LOG] 404 headers={dict(request.headers)}", file=sys.stderr)
+    sys.stderr.flush()
+    return jsonify({"error": "Not found", "path": request.path, "method": request.method}), 404
+
+
+@app.route("/", methods=["GET"])
+def root() -> tuple:
+    """Root endpoint for debugging proxy path."""
+    return jsonify({"message": "Flask root", "path": request.path}), 200
+
+
+@app.route("/health", methods=["GET"])
+def health_no_prefix() -> tuple:
+    """Health check without /api prefix for debugging."""
+    return jsonify({"status": "ok", "path": request.path}), 200
+
+
 @app.route("/api/health", methods=["GET"])
 def health_check() -> tuple:
     """Return a simple health-check response."""
@@ -60,4 +93,7 @@ def analyze() -> tuple:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    HOST = os.environ.get("FLASK_HOST", "0.0.0.0")
+    PORT = int(os.environ.get("FLASK_PORT", "5000"))
+    DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() in ("true", "1", "yes")
+    app.run(host=HOST, port=PORT, debug=DEBUG)
