@@ -19,18 +19,26 @@ load_dotenv()
 class NanoGPTClient:
     """Client for interacting with the NanoGPT API."""
 
-    def __init__(self, api_key: str | None = None, base_url: str = "https://nano-gpt.com/api/v1") -> None:
+    def __init__(
+        self,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        model: str | None = None,
+    ) -> None:
         """Initialize the NanoGPT client.
 
         Args:
-            api_key: API key for NanoGPT. If not provided, loads from NANOGPT_API_KEY env var.
-            base_url: Base URL for the NanoGPT API.
+            api_key: API key for the LLM. If not provided, loads from LLM_API_KEY env var.
+            base_url: Base URL for the LLM API. If not provided, loads from LLM_BASE_URL env var.
+            model: Model name to use. If not provided, loads from LLM_MODEL env var.
         """
-        key = api_key or os.getenv("NANOGPT_API_KEY")
+        key = api_key or os.getenv("LLM_API_KEY") or os.getenv("NANOGPT_API_KEY")
         if not key:
-            raise ValueError("NANOGPT_API_KEY is not set. Provide it via argument or .env file.")
+            raise ValueError("LLM_API_KEY is not set. Provide it via argument or .env file.")
 
-        self.client = OpenAI(api_key=key, base_url=base_url)
+        resolved_base_url = base_url or os.getenv("LLM_BASE_URL", "https://nano-gpt.com/api/v1")
+        self.model = model or os.getenv("LLM_MODEL", "minimax/minimax-m2.7")
+        self.client = OpenAI(api_key=key, base_url=resolved_base_url)
 
     def complete(self, prompt: str, system_prompt: str = "") -> str:
         """Send a completion request to the NanoGPT API.
@@ -48,7 +56,7 @@ class NanoGPTClient:
         messages.append({"role": "user", "content": prompt})
 
         response = self.client.chat.completions.create(
-            model="minimax/minimax-m2.7",  # NanoGPT supports OpenAI-compatible models
+            model=self.model,
             messages=messages,
             temperature=0.2,
             max_tokens=2048,
