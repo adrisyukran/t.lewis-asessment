@@ -8,3 +8,5 @@ numpy
 openai
 python-dotenv
 reportlab
+flask-cors
+gunicorn
