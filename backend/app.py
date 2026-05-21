@@ -17,6 +17,23 @@ TEMP_DIR = Path(tempfile.gettempdir()) / "campaign_analysis"
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
+@app.before_request
+def log_request() -> None:
+    """Log every incoming request for debugging."""
+    import sys
+    print(f"[BACKEND LOG] {request.method} {request.path}", file=sys.stderr)
+    sys.stderr.flush()
+
+
+@app.errorhandler(404)
+def handle_404(e) -> tuple:
+    """Log 404 errors with the requested path."""
+    import sys
+    print(f"[BACKEND LOG] 404 NOT FOUND: {request.method} {request.path}", file=sys.stderr)
+    sys.stderr.flush()
+    return jsonify({"error": "Not found", "path": request.path, "method": request.method}), 404
+
+
 @app.route("/api/health", methods=["GET"])
 def health_check() -> tuple:
     """Return a simple health-check response."""
