@@ -107,6 +107,38 @@ The goal is a **proof-of-concept that demonstrates core competency**—the integ
 
 ---
 
+## How to Use
+
+1. Start the application (see the setup instructions in your environment).
+2. Upload a **campaign report** (PDF or image) and a **brand guidelines** text file via the web interface.
+3. The pipeline will automatically extract metrics, retrieve relevant guideline context, and generate a structured analysis.
+4. View the results—comparison, red flag, opportunity, and summary—directly in the UI.
+
+---
+
+## Sample Data
+
+Sample test data is provided in the [`data/`](data/) folder for quick testing:
+
+- [`aurora_q1_report.pdf`](data/aurora_q1_report.pdf) — a sample campaign report
+- [`aurora_guidelines.txt`](data/aurora_guidelines.txt) — sample brand guidelines
+
+Use these files to verify the pipeline end-to-end without preparing your own data.
+
+---
+
+## Demo Video
+
+*A demo video walkthrough will be added here.*
+
+---
+
+## LLM Configuration
+
+This project was developed and tested using **NanoGPT** (OpenAI-compatible). You can switch to any other OpenAI-compatible LLM provider by editing the `.env` file and updating the API base URL and key as needed.
+
+---
+
 ## License
 
 This project is a proof-of-concept for demonstration purposes.
