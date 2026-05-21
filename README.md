@@ -129,7 +129,10 @@ Use these files to verify the pipeline end-to-end without preparing your own dat
 
 ## Demo Video
 
-<video controls src="data/demo-vids.mp4" title="Demo Walkthrough"></video>
+
+https://github.com/user-attachments/assets/a73007ec-02c3-471a-9a1f-5735b2949fcb
+
+
 
 ---
 
