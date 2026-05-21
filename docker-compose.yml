@@ -90,7 +90,7 @@ networks:
   campaign-network:
     driver: bridge
     name: campaign-network
-    external: false
+    external: true
 
 # ─────────────────────────────────────────────────────────────────
 # Volumes
