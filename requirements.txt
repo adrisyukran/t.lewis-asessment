@@ -2,6 +2,7 @@ pytesseract
 pdf2image
 PyPDF2
 flask
+flask-cors
 pillow
 sentence-transformers
 numpy
